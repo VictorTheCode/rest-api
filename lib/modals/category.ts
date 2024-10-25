@@ -8,6 +8,6 @@ const CategorySchema = new Schema(
   { timestamps: true }
 );
 
-const Category = models.Cateory || model("Category", CategorySchema);
+const Category = models.Category || model("Category", CategorySchema);
 
 export default Category;
