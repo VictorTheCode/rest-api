@@ -3,7 +3,6 @@
 import connect from "@/lib/db";
 import Category from "@/lib/modals/category";
 import User from "@/lib/modals/user";
-import { ObjectId } from "mongodb";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -25,7 +24,7 @@ export const PATCH = async (req: Request, context: { params: any }) => {
 
     if (!categoryId || !Types.ObjectId.isValid(categoryId)) {
       return new NextResponse(
-        JSON.stringify({ message: "Invalid or missing categpryId" }),
+        JSON.stringify({ message: "Invalid or missing category Id" }),
         { status: 400 }
       );
     }
@@ -67,9 +66,8 @@ export const PATCH = async (req: Request, context: { params: any }) => {
       { status: 200 }
     );
   } catch (err: any) {
-    return new NextResponse("Error in updating category" + err.message, {
+    return new NextResponse("Error in updating category " + err.message, {
       status: 500,
-      statusText: "Your code no run Ejeh!!!",
     });
   }
 };
