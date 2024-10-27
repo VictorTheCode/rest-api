@@ -71,3 +71,59 @@ export const PATCH = async (req: Request, context: { params: any }) => {
     });
   }
 };
+
+export const DELETE = async (req: Request, context: { params: any }) => {
+  const categoryId = context.params.category;
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId || !Types.ObjectId.isValid(userId)) {
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid or missing user ID" }),
+        { status: 400 }
+      );
+    }
+
+    if (!categoryId || !Types.ObjectId.isValid(categoryId)) {
+      return new NextResponse(
+        JSON.stringify({ message: "Invalid or missing category ID" }),
+        { status: 400 }
+      );
+    }
+
+    await connect();
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return new NextResponse(JSON.stringify({ message: "User not found" }), {
+        status: 404,
+      });
+    }
+
+    const category = await Category.findOne({ _id: categoryId, user: userId });
+
+    if (!category) {
+      return new NextResponse(
+        JSON.stringify({
+          message: "Category not found or does not belong to its user",
+        }),
+        {
+          status: 404,
+        }
+      );
+    }
+
+    await Category.findByIdAndDelete(categoryId);
+
+    return new NextResponse(
+      JSON.stringify({ message: "Category is deleted" }),
+      { status: 200 }
+    );
+  } catch (err: any) {
+    return new NextResponse("Error in deleting category " + err.message, {
+      status: 500,
+    });
+  }
+};
