@@ -9,8 +9,8 @@ import { NextResponse } from "next/server";
 import Blog from "@/lib/modals/blogs";
 
 export const GET = async (req: Request, context: { params: any }) => {
-  const blogId = context.params.blog;
-
+  const { blog } = await context.params;
+  const blogId = blog;
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
@@ -52,9 +52,27 @@ export const GET = async (req: Request, context: { params: any }) => {
         { status: 404 }
       );
     }
+
+    const blog = await Blog.findOne({
+      _id: blogId,
+      user: new Types.ObjectId(userId),
+      category: new Types.ObjectId(categoryId),
+    });
+
+    if (!blog) {
+      return new NextResponse(JSON.stringify({ message: "Blog not found" }), {
+        status: 404,
+      });
+    }
+
+    return new NextResponse(JSON.stringify({ blog }), {
+      status: 200,
+    });
   } catch (err: any) {
     return new NextResponse("Error in fetching a blog" + err.message, {
       status: 500,
     });
   }
 };
+
+export const POST = async (req: Request, context: { params: any }) => {};
