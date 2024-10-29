@@ -69,9 +69,24 @@ export const GET = async (req: Request) => {
       ];
     }
 
+    if (startDate && endDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    } else if (startDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+      };
+    } else if (endDate) {
+      filter.createdAt = {
+        $lte: new Date(endDate),
+      };
+    }
+
     // TODO: Add some blog posts
 
-    const blogs = await Blog.find(filter);
+    const blogs = await Blog.find(filter).toSorted({ createdAt: "asc" });
 
     return new NextResponse(JSON.stringify({ blogs }), {
       status: 200,
