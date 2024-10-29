@@ -13,6 +13,9 @@ export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const categoryId = searchParams.get("categoryId");
+    const searchKeywords = searchParams.get("keywords") as string;
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     if (!userId || !Types.ObjectId.isValid(userId)) {
       return new NextResponse(
@@ -51,6 +54,20 @@ export const GET = async (req: Request) => {
       user: new Types.ObjectId(userId),
       category: new Types.ObjectId(categoryId),
     };
+
+    if (searchKeywords) {
+      filter.$or = [
+        {
+          title: { $regex: searchKeywords, $options: "i" },
+        },
+        {
+          description: {
+            $regex: searchKeywords,
+            $options: "i",
+          },
+        },
+      ];
+    }
 
     // TODO: Add some blog posts
 
