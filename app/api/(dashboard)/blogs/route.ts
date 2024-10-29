@@ -16,6 +16,8 @@ export const GET = async (req: Request) => {
     const searchKeywords = searchParams.get("keywords") as string;
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     if (!userId || !Types.ObjectId.isValid(userId)) {
       return new NextResponse(
@@ -84,9 +86,12 @@ export const GET = async (req: Request) => {
       };
     }
 
-    // TODO: Add some blog posts
+    const skip = (page - 1) * limit;
 
-    const blogs = await Blog.find(filter).toSorted({ createdAt: "asc" });
+    const blogs = await Blog.find(filter)
+      .sort({ createdAt: "asc" })
+      .skip(skip)
+      .limit(limit);
 
     return new NextResponse(JSON.stringify({ blogs }), {
       status: 200,
